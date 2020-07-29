@@ -1,0 +1,3 @@
+#! /bin/bash
+
+find . -type f ! -path './node_modules/*' -a ! -path './.*/*' -exec grep -l "$1" {} \;
