@@ -5,11 +5,7 @@ function usage {
   exit 1
 }
 
-if [ $# -lt 1 ]; then
-  usage
-fi
-
-ACTION="$1"
+ACTION="${1:-list}"
 
 if [ "${ACTION}" = "list" ]; then
   hub pr list
@@ -23,6 +19,8 @@ elif [ "${ACTION}" = "merge" ]; then
   else
     usage
   fi
+else
+  usage
 fi
 
 exit 0
