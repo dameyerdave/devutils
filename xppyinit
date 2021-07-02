@@ -2,7 +2,16 @@
 
 if [ ! -f .gitignore ]; then
   cat > .gitignore << EOF
+# Development Environment
+.vscode
+
+# Environment configuration
 .env*
+
+# Folders
+build
+dist
+*.egg-info
 EOF
 fi
 
@@ -14,10 +23,13 @@ fi
 
 if [ ! -f .envrc ]; then
   cat > .envrc << EOF
-export PYTHONPATH=.:$(pipenv --py)
+export PYTHONPATH=.:\$(pipenv --py)
 export PIPENV_SKIP_LOCK=true
 export PIPENV_VERBOSITY=-1
 EOF
 fi
 
 touch .env
+
+pipenv install flake8 --dev
+pipenv install autopep8 --dev
