@@ -1,0 +1,115 @@
+#!/bin/bash
+
+DIR=$(pwd)
+
+function die {
+  echo "Error occured. Closed unexpectedly."
+  exit 1
+}
+
+if [ ! -d api ]; then
+  mkdir -p api/app
+  cd api/app
+  cat > requirements_dev.txt << EOF
+# dev
+flake8
+autopep8
+EOF
+  echo "Installing dev dependencies..."
+  pipenv install --skip-lock -r requirements_dev.txt || die
+
+  echo "Installing dependencies..."
+  cat > requirements.txt << EOF
+# Django dependencies
+Django
+djangorestframework
+django-cors-headers
+django-filter
+psycopg2
+Pillow
+django-computed-property
+djangorestframework_jwt
+
+# MkDocs dependecies
+git+https://github.com/dameyerdave/django-mkdocs.git
+mkdocs
+mkdocs-include-markdown-plugin
+mkdocs-material-extensions
+mkdocs-material
+EOF
+  pipenv run pip install -r requirements.txt || die
+  pipenv run pip freeze > requirements.txt || die
+fi
+
+cd ${DIR}
+
+if [ ! -d ui ]; then
+  mkdir -p ui
+  cd ui
+  cat > .vuerc << EOF
+  {
+    "useConfigFiles": false,
+    "plugins": {
+      "@vue/cli-plugin-babel": {},
+      "@vue/cli-plugin-typescript": {
+        "classComponent": true,
+        "useTsWithBabel": true
+      },
+      "@vue/cli-plugin-router": {
+        "historyMode": true
+      },
+      "@vue/cli-plugin-vuex": {},
+      "@vue/cli-plugin-eslint": {
+        "config": "prettier",
+        "lintOn": [
+          "save"
+        ]
+      },
+      "@vue/cli-plugin-unit-jest": {},
+      "@vue/cli-plugin-e2e-cypress": {}
+    },
+    "vueVersion": "3",
+    "cssPreprocessor": "dart-sass"
+  }
+EOF
+  vue create --preset .vuerc app || die
+  cd app
+  yarn global upgrade --latest || die
+  yarn add bootstrap || die
+  yarn add @popperjs/core || die
+fi
+
+cd ${DIR}
+
+if [ ! -f .gitignore ]; then
+  cat > .gitignore << EOF
+# Development Environment
+.vscode
+
+# Environment configuration
+.env*
+
+# Folders
+build
+dist
+node_modules
+*.egg-info
+EOF
+fi
+
+if [ ! -f .dockerignore ]; then
+  cat > .dockerignore << EOF
+.env*
+node_modules
+EOF
+fi
+
+if [ ! -f .envrc ]; then
+  cat > .envrc << EOF
+export PYTHONPATH=.:\$(pipenv --py)
+export PIPENV_SKIP_LOCK=true
+export PIPENV_VERBOSITY=-1
+EOF
+fi
+
+touch .env
