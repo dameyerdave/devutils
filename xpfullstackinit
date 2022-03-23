@@ -91,7 +91,8 @@ django-filter
 psycopg2
 Pillow
 django-computed-property
-djangorestframework_jwt
+drf-jwt
+drf-schema-adapter
 
 # MkDocs dependecies
 git+https://github.com/dameyerdave/django-mkdocs.git
@@ -178,16 +179,16 @@ EOF
 # PREREQUISITS:
 # yarn add -D --modules-folder ./node_modules git-release-notes
 
-DIR="$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/../"
+DIR="\$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 GRN="\${DIR}/node_modules/.bin/git-release-notes"
-CHANGELOG="\${DIR}/docs/CHANGELOG.md"
+CHANGELOG="\${DIR}/docs/docs/CHANGELOG.md"
 
 if [ ! -f \${GRN} ]; then
   echo "Installing git-release-notes because it's not there..."
   yarn add -D --modules-folder \${DIR}/node_modules git-release-notes
 fi
 
-first=$(git log --reverse --pretty="%h" | head -1)
+first=\$(git log --reverse --pretty="%h" | head -1)
 last=HEAD
 
 echo "Generating CHANGELOG..."
@@ -246,7 +247,8 @@ INSTALLED_APPS += [
   'django_filters',
   'corsheaders',
   'rest_framework',
-  'rest_framework.authtoken',
+  'rest_framework_jwt',
+  'rest_framework_jwt.blacklist',
   'django_mkdocs',
   '${PROJECT_NAME}',
 ]
@@ -261,7 +263,7 @@ EOF
   ###
 
   mkdir -p meta
-  cd ${DIR}/api/app/${PROJECT_NAME}/meta
+  cd ${DIR}/api/app/meta
   touch __init__.py
   cat > apps.py << EOF
 from django.apps import AppConfig
@@ -571,6 +573,9 @@ build
 dist
 node_modules
 *.egg-info
+
+# Generated files
+CHANGELOG.md
 EOF
 fi
 
