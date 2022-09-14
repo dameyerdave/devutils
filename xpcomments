@@ -17,5 +17,5 @@ if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     else
       printf "%s\n" "${id}"
     fi
-  done < <(gh api /repos/SVIPdb/svip/comments | jq -r '.[] |"\(.id)π\(.body)π\(.html_url)"')
+  done < <(gh api /repos/${user}/${repo}/comments | jq -r '.[] |"\(.id)π\(.body)π\(.html_url)"')
 fi
